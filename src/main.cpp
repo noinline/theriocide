@@ -16,9 +16,9 @@
                  : "%rax", "%rdi", "%rsi", "%rdx");                            \
   } while (0)
 
-#define __tc_return(__tc_num)                                                  \
+#define __tc_exit(__tc_num)                                                    \
   do {                                                                         \
-    constexpr __tc_type::__int __rawrturn{__tc_num};                           \
+    const __tc_type::__int __rawrturn{__tc_num};                               \
     asm volatile("mov $60, %%rax;"                                             \
                  "mov %[__rawrturn], %%rdi;"                                   \
                  "syscall;"                                                    \
@@ -33,7 +33,20 @@ typedef int           __int;
 typedef char          __char;
 typedef void          __void;
 typedef std::ofstream __ofstream;
+typedef std::string   __string;
 } // namespace __tc_type
+
+namespace __tc_helper {
+template <typename... __tc_args>
+auto
+__tc_throw_and_exit(const __tc_type::__char *__tc_msg,
+                    const __tc_type::__int   __tc_num, __tc_args &&...args)
+    -> decltype(__tc_type::__void())
+{
+  __tc_print(__tc_msg, std::forward<__tc_args>(args)...);
+  __tc_exit(__tc_num);
+}
+} // namespace __tc_helper
 
 namespace __tc_animation {
 /* i'll do something later */
@@ -66,13 +79,32 @@ __tc_create_img(__tc_type::__ofstream   &__tc_img,
 }
 } // namespace __tc_image
 
-auto
-main(__tc_type::__void) -> decltype(__tc_type::__int())
+extern "C"
 {
+auto
+__tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
+    -> decltype(__tc_type::__int())
+{
+  constexpr __tc_type::__int __max_argc_val{2};
+  if (__tc_argc < __max_argc_val || !__tc_argv[1])
+    __tc_helper::__tc_throw_and_exit(
+        "No valid arguments specified! [__tc_argc < available "
+        "arguments(1)]\nUsage: %s <output_file>\n",
+        1, __tc_argv[0]);
+  else if (__tc_argc > __max_argc_val)
+    __tc_helper::__tc_throw_and_exit(
+        "Too many arguments! [__tc_argc > available arguments(1)]\nUsage: %s "
+        "<output_file>\n",
+        1, __tc_argv[0]);
+
+  __tc_type::__string __fname_input{__tc_argv[1]};
+  __fname_input += ".ppm";
   __tc_type::__ofstream    __img{};
-  const __tc_type::__char *__fname{"image.ppm"};
+  const __tc_type::__char *__fname = __fname_input.c_str();
   __tc_image::__tc_create_img(__img, __fname);
 
-  __tc_return(0);
+  __tc_exit(0);
   __builtin_unreachable();
 }
+}
+extern __typeof(__tc_start) main __attribute__((weak, alias("__tc_start")));
