@@ -1,5 +1,31 @@
 #include <fstream>
+#include <string.h>
 #include <unistd.h>
+
+#define __tc_print(__tc_fmt, ...)                                              \
+  do {                                                                         \
+    __tc_type::__char __buf[1024];                                             \
+    snprintf(__buf, sizeof(__buf), __tc_fmt, ##__VA_ARGS__);                   \
+    asm volatile("movq $1, %%rax;"                                             \
+                 "movq $1, %%rdi;"                                             \
+                 "movq %0, %%rsi;"                                             \
+                 "movq %1, %%rdx;"                                             \
+                 "syscall;"                                                    \
+                 :                                                             \
+                 : "r"(__buf), "r"(strlen(__buf))                              \
+                 : "%rax", "%rdi", "%rsi", "%rdx");                            \
+  } while (0)
+
+#define __tc_return(__tc_num)                                                  \
+  do {                                                                         \
+    constexpr __tc_type::__int __rawrturn{__tc_num};                           \
+    asm volatile("mov $60, %%rax;"                                             \
+                 "mov %[__rawrturn], %%rdi;"                                   \
+                 "syscall;"                                                    \
+                 :                                                             \
+                 : [__rawrturn] "i"(__rawrturn)                                \
+                 : "%rax", "%rdi");                                            \
+  } while (0)
 
 /* it looks so majestic with these >w< */
 namespace __tc_type {
@@ -36,7 +62,7 @@ __tc_create_img(__tc_type::__ofstream   &__tc_img,
   if (__tc_img.is_open())
     __tc_write_img(__tc_img);
   __tc_img.close();
-  printf("Created ppm image: %s\n", __tc_fname);
+  __tc_print("Created ppm image: %s\n", __tc_fname);
 }
 } // namespace __tc_image
 
@@ -47,14 +73,6 @@ main(__tc_type::__void) -> decltype(__tc_type::__int())
   const __tc_type::__char *__fname{"image.ppm"};
   __tc_image::__tc_create_img(__img, __fname);
 
-  /* Yes! I used it here too because why not lol. */
-  /* s/o to my Silly repo. */
-  constexpr __tc_type::__int __rawrturn{};
-  asm volatile("mov $60, %%rax;"
-               "mov %[__rawrturn], %%rdi;"
-               "syscall;"
-               :
-               : [__rawrturn] "i"(NULL)
-               : "%rax", "%rdi");
+  __tc_return(0);
   __builtin_unreachable();
 }
