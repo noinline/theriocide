@@ -1,9 +1,10 @@
 CXX ?= clang++
-CXXFLAGS := -Og -fsanitize=address -fsanitize=undefined
+CXXFLAGS := -Og -fsanitize=address -fsanitize=undefined -std=c++17
 
 SRCS := $(wildcard src/*.cpp)
+HPPS := $(wildcard src/*.hpp)
 OBJS := $(SRCS:src/%.cpp=o/%.o)
-
+CFMT ?= clang-format
 OUT := theriocide
 
 o/%.o: src/%.cpp
@@ -16,10 +17,13 @@ theriocide:
 compile: $(OBJS)
 	$(CXX) $(OBJS) $(CXXFLAGS) -o $(OUT)
 
+format:
+	$(CFMT) -i $(SRCS) $(HPPS)
+
 clean:
 	rm -rf ./o $(OUT)
 	rm -ff ./*.ppm
 
 install: theriocide
 
-.PHONY: theriocide compile clean install
+.PHONY: theriocide compile format clean install
