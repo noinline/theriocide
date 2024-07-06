@@ -1,7 +1,7 @@
 #include "utils.hpp"
 
+#include <getopt.h>
 #include <unistd.h>
-
 namespace __tc_color {
 constexpr auto
 __tc_color_r(__tc_type::__int __tc_col = 0) -> decltype(__tc_type::__int())
@@ -110,24 +110,53 @@ auto
 __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
     -> decltype(__tc_type::__int())
 {
-  __tc_type::__int __max_argc_val{0};
-  if (__tc_argc <= 5)
-    __max_argc_val = 5;
-  else if (__tc_argc > 5)
-    __max_argc_val = 8;
+  __tc_type::__int __max_argc_val{5};
+ 
+
+  static struct option __long_options[] = {
+      {"color", no_argument, 0, 'c'},
+      {"help",  no_argument, 0, 'h'},
+      {0,       0,           0, 0  }
+  };
+  __tc_type::__int __option_index = 0;
+
+  __tc_type::__int __c =
+      getopt_long(__tc_argc, __tc_argv, "ch", __long_options, &__option_index);
+
+  switch (__c) {
+  case 'h':
+    __tc_helper::__tc_throw_and_exit(
+        "Usage: %s "
+        "<output_file> <animation_type> <size_x> "
+        "<size_y>\nOptional flags:\n"
+        "<color_red> <color_green> <color_blue>. '-c(--color)'\n"
+        "'-h(--help)' outputs this message.\n",
+        __tc_argv[0]);
+    break;
+  case 'c': __max_argc_val = 9; break;
+
+  case '?':
+    /* getopt_long already printed an error message. */
+    break;
+  }
 
   if (__tc_argc < __max_argc_val || !__tc_argv[1])
     __tc_helper::__tc_throw_and_exit(
         "No valid arguments specified! [__tc_argc < available "
-        "arguments(4)]\nUsage: %s <output_file> <animation_type> <size_x> "
-        "<size_y>\nOptional: <color_red> <color_green> <color_blue>\n",
-        __tc_argv[0]);
+        "arguments(%i)].\nUsage: %s "
+        "<output_file> <animation_type> <size_x> "
+        "<size_y>\nOptional flags:\n"
+        "<color_red> <color_green> <color_blue>. '-c(--color)'\n"
+        "'-h(--help)' outputs this message.\n",
+        __max_argc_val, __tc_argv[0]);
   else if (__tc_argc > __max_argc_val)
     __tc_helper::__tc_throw_and_exit(
-        "Too many arguments! [__tc_argc > available arguments(4)]\nUsage: %s "
-        "<output_file> <animation_type> <size_x> <size_y>\nOptional: "
-        "<color_red> <color_green> <color_blue>\n",
-        __tc_argv[0]);
+        "Too many arguments! [__tc_argc > available arguments(%i)].\nUsage: %s "
+        "<output_file> <animation_type> <size_x> "
+        "<size_y>\nOptional flags:\n"
+        "<color_red> <color_green> <color_blue>. '-c(--color)'\n"
+        "'-h(--help)' outputs this message.\n",
+        __max_argc_val, __tc_argv[0]);
 
   __tc_type::__string __fname_input{__tc_argv[1]};
   __fname_input += ".ppm";
@@ -153,7 +182,7 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
   __tc_type::__int __color_g = 255;
   __tc_type::__int __color_b = 255;
 
-  if (__max_argc_val == 8) {
+  if (__max_argc_val == 9) {
     __color_r = std::stoi(__tc_argv[5]);
     if (__color_r > 255 || __color_r < 0)
       __tc_helper::__tc_throw_and_exit(
