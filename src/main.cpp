@@ -37,26 +37,34 @@ __tc_perform(__tc_type::__ofstream               &__tc_img,
              __tc_type::__int x, __tc_type::__int y = 0,
              __tc_type::__int __tc_color_r = 0,
              __tc_type::__int __tc_color_g = 0,
-             __tc_type::__int __tc_color_b = 0)
+             __tc_type::__int __tc_color_b = 0,
+             __tc_type::__int __tc_max_value = 0)
 
 {
   switch (__tc_anim_type) {
   case __tc_normal:
-    __tc_img << x * __tc_color::__tc_color_r(__tc_color_r) << " "
-             << x * __tc_color::__tc_color_g(__tc_color_g) << " "
-             << x * __tc_color::__tc_color_b(__tc_color_b) << '\n';
+    __tc_img << (x * __tc_color::__tc_color_r(__tc_color_r)) % __tc_max_value
+             << " "
+             << (x * __tc_color::__tc_color_g(__tc_color_g)) % __tc_max_value
+             << " "
+             << (x * __tc_color::__tc_color_b(__tc_color_b)) % __tc_max_value
+             << std::endl;
     break;
   case __tc_random: {
     srand(time(NULL));
-    __tc_img << __tc_helper::__tc_clamp(
-                    static_cast<__tc_type::__long__long__int>((x * y)) * rand())
-             << " "
-             << __tc_helper::__tc_clamp(
-                    static_cast<__tc_type::__long__long__int>((x * y)) * rand())
-             << " "
-             << __tc_helper::__tc_clamp(
-                    static_cast<__tc_type::__long__long__int>((x * y)) * rand())
-             << '\n';
+    __tc_img
+        << (__tc_helper::__tc_clamp(
+               static_cast<__tc_type::__long__long__int>((x * y)) * rand())) %
+               __tc_max_value
+        << " "
+        << (__tc_helper::__tc_clamp(
+               static_cast<__tc_type::__long__long__int>((x * y)) * rand())) %
+               __tc_max_value
+        << " "
+        << (__tc_helper::__tc_clamp(
+               static_cast<__tc_type::__long__long__int>((x * y)) * rand())) %
+               __tc_max_value
+        << std::endl;
   } break;
   }
 }
@@ -81,7 +89,7 @@ __tc_write_img(__tc_type::__ofstream               &__tc_img,
   for (__tc_type::__int y = 0; y < __tc_size_y % __max_val; ++y)
     for (__tc_type::__int x = 0; x < __tc_size_x % __max_val; ++x)
       __tc_animation::__tc_perform(__tc_img, __tc_anim_type, x, y, __tc_color_r,
-                                   __tc_color_g, __tc_color_b);
+                                   __tc_color_g, __tc_color_b, __max_val);
 }
 
 auto
@@ -111,7 +119,6 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
     -> decltype(__tc_type::__int())
 {
   __tc_type::__int __max_argc_val{5};
- 
 
   static struct option __long_options[] = {
       {"color", no_argument, 0, 'c'},
@@ -126,11 +133,15 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
   switch (__c) {
   case 'h':
     __tc_helper::__tc_throw_and_exit(
-        "Usage: %s "
+        "Usage:\n%s "
         "<output_file> <animation_type> <size_x> "
-        "<size_y>\nOptional flags:\n"
-        "<color_red> <color_green> <color_blue>. '-c(--color)'\n"
-        "'-h(--help)' outputs this message.\n",
+        "<size_y>\n\n"
+        "Animation types:\n<0> - normal\n<1> - random\n\n"
+        "Optional flags:\n"
+        "'<color_red> <color_green> <color_blue> --color'.\n"
+        "'--help' - prints this message.\n\n"
+        "Examples:\n./theriocide test 0 500 500\n./theriocide test 1 500 "
+        "500\n./theriocide test 0 500 500 255 255 255 --color\n",
         __tc_argv[0]);
     break;
   case 'c': __max_argc_val = 9; break;
@@ -143,20 +154,13 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
   if (__tc_argc < __max_argc_val || !__tc_argv[1])
     __tc_helper::__tc_throw_and_exit(
         "No valid arguments specified! [__tc_argc < available "
-        "arguments(%i)].\nUsage: %s "
-        "<output_file> <animation_type> <size_x> "
-        "<size_y>\nOptional flags:\n"
-        "<color_red> <color_green> <color_blue>. '-c(--color)'\n"
-        "'-h(--help)' outputs this message.\n",
-        __max_argc_val, __tc_argv[0]);
+        "arguments(%i)].\nConsider using --help flag for more information.\n",
+        __max_argc_val);
   else if (__tc_argc > __max_argc_val)
     __tc_helper::__tc_throw_and_exit(
-        "Too many arguments! [__tc_argc > available arguments(%i)].\nUsage: %s "
-        "<output_file> <animation_type> <size_x> "
-        "<size_y>\nOptional flags:\n"
-        "<color_red> <color_green> <color_blue>. '-c(--color)'\n"
-        "'-h(--help)' outputs this message.\n",
-        __max_argc_val, __tc_argv[0]);
+        "Too many arguments! [__tc_argc > available arguments(%i)].\nConsider "
+        "using --help flag for more information.\n",
+        __max_argc_val);
 
   __tc_type::__string __fname_input{__tc_argv[1]};
   __fname_input += ".ppm";
