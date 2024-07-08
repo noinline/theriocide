@@ -9,6 +9,7 @@
 namespace __tc_type {
 typedef bool          __bool;
 typedef char          __char;
+typedef float         __float;
 typedef int           __int;
 typedef long long int __long__long__int;
 typedef std::ofstream __ofstream;
@@ -54,10 +55,23 @@ const __tc_type::__long__long__int __tc_long_long_int_min =
 namespace __tc_helper {
 
 inline auto
-__tc_clamp(__tc_type::__int __tc_value) -> decltype(__tc_type::__int())
+__tc_clamp_int_max(__tc_type::__int __tc_value) -> decltype(__tc_type::__int())
 {
   return std::max(__tc_value::__tc_int_min,
                   std::min(__tc_value, __tc_value::__tc_int_max));
+}
+
+inline auto
+__tc_clamp(const __tc_type::__int __tc_value_min,
+           const __tc_type::__int __tc_value_to_clamp,
+           const __tc_type::__int __tc_value_max)
+    -> decltype(__tc_type::__int())
+{
+  if (__tc_value_to_clamp > __tc_value_max)
+    return __tc_value_max;
+  if (__tc_value_to_clamp < __tc_value_min)
+    return __tc_value_min;
+  return __tc_value_to_clamp;
 }
 
 template <typename... __tc_args>

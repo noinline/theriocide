@@ -34,34 +34,42 @@ inline constexpr __tc_type::__int __tc_anim_count = 1;
 auto
 __tc_perform(__tc_type::__ofstream               &__tc_img,
              const __tc_animation::__tc_type_enum __tc_anim_type,
-             __tc_type::__int x, __tc_type::__int y = 0,
+             __tc_type::__int x = 0, __tc_type::__int y = 0,
              __tc_type::__int __tc_color_r = 0,
              __tc_type::__int __tc_color_g = 0,
              __tc_type::__int __tc_color_b = 0,
-             __tc_type::__int __tc_max_value = 0)
+             __tc_type::__int __tc_max_value = 0,
+             __tc_type::__int __tc_size_x = 0, __tc_type::__int __tc_size_y = 0)
 
 {
   switch (__tc_anim_type) {
   case __tc_normal:
-    __tc_img << (x * __tc_color::__tc_color_r(__tc_color_r)) % __tc_max_value
-             << " "
-             << (x * __tc_color::__tc_color_g(__tc_color_g)) % __tc_max_value
-             << " "
-             << (x * __tc_color::__tc_color_b(__tc_color_b)) % __tc_max_value
-             << std::endl;
+    __tc_img
+        << __tc_helper::__tc_clamp(0, __tc_max_value,
+                                   ((__tc_type::__float) x / __tc_size_x) *
+                                       __tc_color::__tc_color_r(__tc_color_r))
+        << " "
+        << __tc_helper::__tc_clamp(0, __tc_max_value,
+                                   ((__tc_type::__float) x / __tc_size_x) *
+                                       __tc_color::__tc_color_g(__tc_color_g))
+        << " "
+        << __tc_helper::__tc_clamp(0, __tc_max_value,
+                                   ((__tc_type::__float) x / __tc_size_x) *
+                                       __tc_color::__tc_color_b(__tc_color_b))
+        << std::endl;
     break;
   case __tc_random: {
     srand(time(NULL));
     __tc_img
-        << (__tc_helper::__tc_clamp(
+        << (__tc_helper::__tc_clamp_int_max(
                static_cast<__tc_type::__long__long__int>((x * y)) * rand())) %
                __tc_max_value
         << " "
-        << (__tc_helper::__tc_clamp(
+        << (__tc_helper::__tc_clamp_int_max(
                static_cast<__tc_type::__long__long__int>((x * y)) * rand())) %
                __tc_max_value
         << " "
-        << (__tc_helper::__tc_clamp(
+        << (__tc_helper::__tc_clamp_int_max(
                static_cast<__tc_type::__long__long__int>((x * y)) * rand())) %
                __tc_max_value
         << std::endl;
@@ -83,13 +91,15 @@ __tc_write_img(__tc_type::__ofstream               &__tc_img,
   __tc_print("Writing image data...\n");
   const __tc_type::__char *__type{"P3"};
   __tc_type::__int         __max_val = (__tc_size_x + 1);
+  __tc_type::__int         __max_rgb_val{255};
   __tc_img << __type << '\n';
   __tc_img << __tc_size_x << " " << __tc_size_y << '\n';
-  __tc_img << __max_val << '\n';
+  __tc_img << __max_rgb_val << '\n';
   for (__tc_type::__int y = 0; y < __tc_size_y % __max_val; ++y)
     for (__tc_type::__int x = 0; x < __tc_size_x % __max_val; ++x)
       __tc_animation::__tc_perform(__tc_img, __tc_anim_type, x, y, __tc_color_r,
-                                   __tc_color_g, __tc_color_b, __max_val);
+                                   __tc_color_g, __tc_color_b, __max_rgb_val,
+                                   __tc_size_x, __tc_size_y);
 }
 
 auto
