@@ -47,15 +47,12 @@ __tc_perform(__tc_type::__ofstream            &__tc_img,
   switch (__tc_effect_type) {
   case __tc_normal:
     __tc_img << __tc_helper::__tc_clamp(0, __tc_max_value,
-
                                         __tc_color::__tc_color_r(__tc_color_r))
              << " "
              << __tc_helper::__tc_clamp(0, __tc_max_value,
-
                                         __tc_color::__tc_color_g(__tc_color_g))
              << " "
              << __tc_helper::__tc_clamp(0, __tc_max_value,
-
                                         __tc_color::__tc_color_b(__tc_color_b))
              << std::endl;
     break;
@@ -168,9 +165,9 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
         "Optional flags:\n"
         "'<color_red> <color_green> <color_blue> --color'\n"
         "'--help' - prints this message\n\n"
-        "Examples:\n./theriocide test 0 500 500\n./theriocide test 1 500 "
-        "500\n./theriocide test 0 500 500 255 255 255 --color\n",
-        __tc_argv[0]);
+        "Examples:\n%s test 0 500 500\n%s test 1 500 "
+        "500\n%s test 0 500 500 255 255 255 --color\n",
+        __tc_argv[0], __tc_argv[0], __tc_argv[0], __tc_argv[0]);
     break;
   case 'c': {
     __flag = (__tc_type::__char *) "--color";
@@ -237,7 +234,8 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
   } else if ((__max_argc_val == 9 || strcmp(__flag, "--color") == 0) &&
              __effect_type == 2)
     __tc_helper::__tc_throw_and_exit(
-        "Invalid flag '%s' specified along with <effect_type> (%i).\n", __flag, __effect_type);
+        "Invalid flag '%s' specified along with <effect_type> (%i).\n", __flag,
+        __effect_type);
 
   __tc_type::__ofstream    __img{};
   const __tc_type::__char *__fname = __fname_input.c_str();

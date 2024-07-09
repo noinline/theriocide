@@ -6,6 +6,7 @@ HPPS := $(wildcard src/*.hpp)
 OBJS := $(SRCS:src/%.cpp=o/%.o)
 CFMT ?= clang-format
 OUT := theriocide
+CONV := convert
 
 o/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) $< -o $(CWD)$@ -c
@@ -20,9 +21,12 @@ compile: $(OBJS)
 format:
 	$(CFMT) -i $(SRCS) $(HPPS)
 
+convert:
+	cd ./src/$(CONV)/ && $(MAKE)
+
 clean:
-	rm -rf ./o $(OUT)
-	rm -ff ./*.ppm
+	rm -rf ./o ./$(OUT)
+	rm -rf ./$(CONV) ./*.jpg ./*.ppm
 
 install: theriocide
 
