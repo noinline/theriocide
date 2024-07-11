@@ -13,6 +13,7 @@ typedef float         __float;
 typedef int           __int;
 typedef long long int __long__long__int;
 typedef std::ofstream __ofstream;
+typedef std::ostream  __ostream;
 typedef std::string   __string;
 typedef unsigned char __unsigned_char;
 typedef unsigned int  __unsigned_int;
