@@ -77,6 +77,13 @@ __tc_clamp(const __tc_type::__int __tc_value_min,
   return __tc_value_to_clamp;
 }
 
+inline auto
+__tc_rand(const __tc_type::__int __tc_min, const __tc_type::__int __tc_max)
+    -> decltype(__tc_type::__int())
+{
+  return rand() % (__tc_max - __tc_min + 1) + __tc_min;
+}
+
 template <typename... __tc_args>
 auto
 __tc_throw_and_exit(const __tc_type::__char *__tc_msg, __tc_args &&...args)

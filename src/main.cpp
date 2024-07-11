@@ -29,10 +29,11 @@ enum __tc_type_enum
 {
   __tc_normal = 0,
   __tc_normal_gradient = 1,
-  __tc_random = 2
+  __tc_random = 2,
+  __tc_random_gradient = 3
 };
 
-inline constexpr __tc_type::__int __tc_effect_count = 2;
+inline constexpr __tc_type::__int __tc_effect_count = 3;
 
 auto
 __tc_perform(__tc_type::__ostream             &__tc_img,
@@ -74,19 +75,40 @@ __tc_perform(__tc_type::__ostream             &__tc_img,
     break;
   case __tc_random: {
     srand(time(NULL));
-    __tc_img
-        << (__tc_helper::__tc_clamp_int_max(
-               static_cast<__tc_type::__long__long__int>((x * y)) * rand())) %
-               __tc_max_value
-        << " "
-        << (__tc_helper::__tc_clamp_int_max(
-               static_cast<__tc_type::__long__long__int>((x * y)) * rand())) %
-               __tc_max_value
-        << " "
-        << (__tc_helper::__tc_clamp_int_max(
-               static_cast<__tc_type::__long__long__int>((x * y)) * rand())) %
-               __tc_max_value
-        << std::endl;
+    __tc_img << __tc_helper::__tc_clamp(
+                    0, __tc_max_value,
+                    __tc_color::__tc_color_r(
+                        __tc_helper::__tc_rand(0, __tc_max_value)))
+             << " "
+             << __tc_helper::__tc_clamp(
+                    0, __tc_max_value,
+                    __tc_color::__tc_color_g(
+                        __tc_helper::__tc_rand(0, __tc_max_value)))
+             << " "
+             << __tc_helper::__tc_clamp(
+                    0, __tc_max_value,
+                    __tc_color::__tc_color_b(
+                        __tc_helper::__tc_rand(0, __tc_max_value)))
+             << std::endl;
+  } break;
+  case __tc_random_gradient: {
+    srand(time(NULL));
+
+    __tc_img << __tc_helper::__tc_clamp(
+                    0, __tc_max_value,
+                    ((__tc_type::__float) x / __tc_size_x) *
+                        __tc_helper::__tc_rand(0, __tc_max_value))
+             << " "
+             << __tc_helper::__tc_clamp(
+                    0, __tc_max_value,
+                    ((__tc_type::__float) x / __tc_size_x) *
+                        __tc_helper::__tc_rand(0, __tc_max_value))
+             << " "
+             << __tc_helper::__tc_clamp(
+                    0, __tc_max_value,
+                    ((__tc_type::__float) x / __tc_size_x) *
+                        __tc_helper::__tc_rand(0, __tc_max_value))
+             << std::endl;
   } break;
   }
 }
@@ -163,16 +185,17 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
         "<output_file> <effect_type> <size_x> "
         "<size_y>\n\n"
         "Effect types:\n	<0> - normal\n	<1> - normal gradient\n	<2> - "
-        "random\n\n"
+        "random\n	<3> - random gradient\n\n"
         "Optional flags:\n	"
         "'--color' - colorize image(lol)\n	"
         "'--help' - prints this message\n\n"
         "Examples:\n	%s test 0 500 500\n	%s test 1 500 "
-        "500\n	%s test 2 500 500\n	%s test 0 500 500 "
+        "500\n	%s test 0 500 "
+        "500 "
         "--color 255 255 255\n	"
         "%s test 1 500 500 --color 255 255 255\n",
         __tc_argv[0], __tc_argv[0], __tc_argv[0], __tc_argv[0], __tc_argv[0],
-        __tc_argv[0]);
+        __tc_argv[0], __tc_argv[0]);
     break;
 
   case '?':
@@ -221,7 +244,9 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
 
   /* if --color flag is present and effect type not equals random, colorize
    * image. */
-  if (strcmp(__flag, "--color") == 0 && __effect_type != 2) {
+  if (strcmp(__flag, "--color") == 0 &&
+      (__effect_type != 2 && __effect_type != 3))
+  {
     __color_r = std::stoi(__tc_argv[6]);
     if (__color_r > 255 || __color_r < 0)
       __tc_helper::__tc_throw_and_exit(
@@ -237,7 +262,8 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
       __tc_helper::__tc_throw_and_exit(
           "Invalid color blue value specified! Please specify a value between "
           "0 and 255.\n");
-  } else if (strcmp(__flag, "--color") == 0 && __effect_type == 2)
+  } else if (strcmp(__flag, "--color") == 0 &&
+             (__effect_type == 2 | __effect_type == 3))
     __tc_helper::__tc_throw_and_exit(
         "Invalid flag '%s' specified along with <effect_type> (%i).\n", __flag,
         __effect_type);
