@@ -180,9 +180,9 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
     break;
   }
 
- if (strcmp(__flag, "--color") == 0)
+  if (strcmp(__flag, "--color") == 0)
     __max_argc_val = 9;
- else
+  else
     __max_argc_val = 5;
 
   if (__tc_argc < __max_argc_val || !__tc_argv[1])
@@ -245,9 +245,9 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
   __tc_type::__ofstream    __img{};
   const __tc_type::__char *__fname = __fname_input.c_str();
   __img.open(__fname);
-    __tc_image::__tc_create_img(
-        __img, __fname, (__tc_effect::__tc_type_enum) __effect_type, __size_x,
-        __size_y, __color_r, __color_g, __color_b);
+  __tc_image::__tc_create_img(
+      __img, __fname, (__tc_effect::__tc_type_enum) __effect_type, __size_x,
+      __size_y, __color_r, __color_g, __color_b);
   __img.close();
 
   __tc_helper::__tc_throw_and_exit("Done!\n");
