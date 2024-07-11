@@ -145,13 +145,12 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
   static struct option __long_options[] = {
       {"color", no_argument, 0, 'c'},
       {"help",  no_argument, 0, 'h'},
-      {"raw",   no_argument, 0, 'r'},
       {0,       0,           0, 0  }
   };
   __tc_type::__int __option_index = 0;
 
   __tc_type::__int __c =
-      getopt_long(__tc_argc, __tc_argv, "chr", __long_options, &__option_index);
+      getopt_long(__tc_argc, __tc_argv, "ch", __long_options, &__option_index);
 
   __tc_type::__char *__flag = (__tc_type::__char *) "";
 
@@ -167,7 +166,6 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
         "random\n\n"
         "Optional flags:\n	"
         "'--color' - colorize image(lol)\n	"
-        "'--raw' - outputs raw file contents in stdout\n	"
         "'--help' - prints this message\n\n"
         "Examples:\n	%s test 0 500 500\n	%s test 1 500 "
         "500\n	%s test 2 500 500\n	%s test 0 500 500 "
@@ -177,20 +175,14 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
         __tc_argv[0]);
     break;
 
-  case 'r': __flag = (__tc_type::__char *) "--raw"; break;
-
   case '?':
     /* getopt_long already printed an error message. */
     break;
   }
 
-  if ((strcmp(__flag, "--raw") == 0 && strcmp(__flag, "--color") == 0))
-    __max_argc_val = 10;
-  else if (strcmp(__flag, "--color") == 0)
+ if (strcmp(__flag, "--color") == 0)
     __max_argc_val = 9;
-  else if (strcmp(__flag, "--raw") == 0)
-    __max_argc_val = 6;
-  else
+ else
     __max_argc_val = 5;
 
   if (__tc_argc < __max_argc_val || !__tc_argv[1])
@@ -253,12 +245,6 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
   __tc_type::__ofstream    __img{};
   const __tc_type::__char *__fname = __fname_input.c_str();
   __img.open(__fname);
-  if ((strcmp(__flag, "--raw") == 0 && strcmp(__flag, "--color") == 0) ||
-      strcmp(__flag, "--raw") == 0)
-    __tc_image::__tc_create_img(
-        std::cout, __fname, (__tc_effect::__tc_type_enum) __effect_type,
-        __size_x, __size_y, __color_r, __color_g, __color_b);
-  else
     __tc_image::__tc_create_img(
         __img, __fname, (__tc_effect::__tc_type_enum) __effect_type, __size_x,
         __size_y, __color_r, __color_g, __color_b);
