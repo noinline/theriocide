@@ -13,14 +13,6 @@ Usage
 ./convert --help
 ```
 
-Prerequisites
--------------
-- Working computer;
-- Bloat free OS(Sorry Windows);
-- Clang or any other compiler;
-- 2 Hands and Make;
-- Nothing else.
-
 Compiling
 ---------
 Once you `cd` in a *project* directory you'll need to use make.
