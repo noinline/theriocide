@@ -58,6 +58,17 @@ const __tc_type::__long__long__int __tc_long_long_int_min =
 namespace __tc_helper {
 
 inline auto
+__tc_check_flag(__tc_type::__char  *__tc_flag,
+                __tc_type::__string __tc_flag_to_check)
+    -> decltype(__tc_type::__bool())
+{
+  if (strcmp(__tc_flag, __tc_flag_to_check.c_str()) == 0)
+    return true;
+  else
+    return false;
+}
+
+inline auto
 __tc_clamp_int_max(__tc_type::__int __tc_value) -> decltype(__tc_type::__int())
 {
   return std::max(__tc_value::__tc_int_min,
@@ -78,16 +89,16 @@ __tc_clamp(const __tc_type::__int __tc_value_min,
 }
 
 inline auto
-__tc_rand(const __tc_type::__int __tc_min, const __tc_type::__int __tc_max)
-    -> decltype(__tc_type::__int())
+__tc_rand(const __tc_type::__int __tc_min,
+          const __tc_type::__int __tc_max) -> decltype(__tc_type::__int())
 {
   return rand() % (__tc_max - __tc_min + 1) + __tc_min;
 }
 
 template <typename... __tc_args>
 auto
-__tc_throw_and_exit(const __tc_type::__char *__tc_msg, __tc_args &&...args)
-    -> decltype(__tc_type::__void())
+__tc_throw_and_exit(const __tc_type::__char *__tc_msg,
+                    __tc_args &&...args) -> decltype(__tc_type::__void())
 {
   if constexpr (sizeof...(args) == 0)
     __tc_print("%s", __tc_msg);
