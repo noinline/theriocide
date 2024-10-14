@@ -5,23 +5,49 @@
 #include <unistd.h>
 
 namespace __tc_color {
-constexpr auto
-__tc_color_r(__tc_type::__int __tc_col = 0) -> decltype(__tc_type::__int())
+class __color
 {
-  return __tc_col;
-}
+private:
+  __tc_type::__int __tc_color_r, __tc_color_g, __tc_color_b;
 
-constexpr auto
-__tc_color_g(__tc_type::__int __tc_col = 0) -> decltype(__tc_type::__int())
-{
-  return __tc_col;
-}
+public:
+  constexpr auto
+  __tc_set_color_r(__tc_type::__int __tc_col = 0)
+      -> decltype(__tc_type::__int())
+  {
+    return this->__tc_color_r = __tc_col;
+  }
 
-constexpr auto
-__tc_color_b(__tc_type::__int __tc_col = 0) -> decltype(__tc_type::__int())
-{
-  return __tc_col;
-}
+  constexpr auto
+  __tc_set_color_g(__tc_type::__int __tc_col = 0)
+      -> decltype(__tc_type::__int())
+  {
+    return this->__tc_color_g = __tc_col;
+  }
+
+  constexpr auto
+  __tc_set_color_b(__tc_type::__int __tc_col = 0)
+      -> decltype(__tc_type::__int())
+  {
+    return this->__tc_color_b = __tc_col;
+  }
+
+  constexpr auto
+  __tc_get_color_r() -> decltype(__tc_type::__int())
+  {
+    return __tc_color_r;
+  }
+  constexpr auto
+  __tc_get_color_b() -> decltype(__tc_type::__int())
+  {
+    return __tc_color_g;
+  }
+  constexpr auto
+  __tc_get_color_g() -> decltype(__tc_type::__int())
+  {
+    return __tc_color_b;
+  }
+};
 } // namespace __tc_color
 
 namespace __tc_effect {
@@ -46,48 +72,49 @@ __tc_perform(__tc_type::__ostream             &__tc_img,
              __tc_type::__int __tc_size_x = 0, __tc_type::__int __tc_size_y = 0)
 
 {
+  __tc_color::__color *__color = new __tc_color::__color();
   switch (__tc_effect_type) {
   case __tc_normal:
     __tc_img << __tc_helper::__tc_clamp(0, __tc_max_value,
-                                        __tc_color::__tc_color_r(__tc_color_r))
+                                        __color->__tc_set_color_r(__tc_color_r))
              << " "
              << __tc_helper::__tc_clamp(0, __tc_max_value,
-                                        __tc_color::__tc_color_g(__tc_color_g))
+                                        __color->__tc_set_color_g(__tc_color_g))
              << " "
              << __tc_helper::__tc_clamp(0, __tc_max_value,
-                                        __tc_color::__tc_color_b(__tc_color_b))
+                                        __color->__tc_set_color_b(__tc_color_b))
              << std::endl;
     break;
   case __tc_normal_gradient:
     __tc_img
         << __tc_helper::__tc_clamp(0, __tc_max_value,
                                    ((__tc_type::__float) x / __tc_size_x) *
-                                       __tc_color::__tc_color_r(__tc_color_r))
+                                       __color->__tc_set_color_r(__tc_color_r))
         << " "
         << __tc_helper::__tc_clamp(0, __tc_max_value,
                                    ((__tc_type::__float) x / __tc_size_x) *
-                                       __tc_color::__tc_color_g(__tc_color_g))
+                                       __color->__tc_set_color_g(__tc_color_g))
         << " "
         << __tc_helper::__tc_clamp(0, __tc_max_value,
                                    ((__tc_type::__float) x / __tc_size_x) *
-                                       __tc_color::__tc_color_b(__tc_color_b))
+                                       __color->__tc_set_color_b(__tc_color_b))
         << std::endl;
     break;
   case __tc_random: {
     srand(time(NULL));
     __tc_img << __tc_helper::__tc_clamp(
                     0, __tc_max_value,
-                    __tc_color::__tc_color_r(
+                    __color->__tc_set_color_r(
                         __tc_helper::__tc_rand(0, __tc_max_value)))
              << " "
              << __tc_helper::__tc_clamp(
                     0, __tc_max_value,
-                    __tc_color::__tc_color_g(
+                    __color->__tc_set_color_g(
                         __tc_helper::__tc_rand(0, __tc_max_value)))
              << " "
              << __tc_helper::__tc_clamp(
                     0, __tc_max_value,
-                    __tc_color::__tc_color_b(
+                    __color->__tc_set_color_b(
                         __tc_helper::__tc_rand(0, __tc_max_value)))
              << std::endl;
   } break;
@@ -111,6 +138,7 @@ __tc_perform(__tc_type::__ostream             &__tc_img,
              << std::endl;
   } break;
   }
+  delete __color;
 }
 } // namespace __tc_effect
 
@@ -139,15 +167,12 @@ __tc_write_img(__tc_type::__ostream             &__tc_img,
 }
 
 auto
-__tc_create_img(__tc_type::__ostream             &__tc_img,
-                const __tc_type::__char          *__tc_fname,
-                const __tc_effect::__tc_type_enum __tc_effect_type,
-                const __tc_type::__int            __tc_size_x,
-                const __tc_type::__int            __tc_size_y,
-                const __tc_type::__int            __tc_color_r,
-                const __tc_type::__int            __tc_color_g,
-                const __tc_type::__int            __tc_color_b)
-    -> decltype(__tc_type::__void())
+__tc_create_img(
+    __tc_type::__ostream &__tc_img, const __tc_type::__char *__tc_fname,
+    const __tc_effect::__tc_type_enum __tc_effect_type,
+    const __tc_type::__int __tc_size_x, const __tc_type::__int __tc_size_y,
+    const __tc_type::__int __tc_color_r, const __tc_type::__int __tc_color_g,
+    const __tc_type::__int __tc_color_b) -> decltype(__tc_type::__void())
 {
   if (__tc_img.good())
     __tc_write_img(__tc_img, __tc_effect_type, __tc_size_x, __tc_size_y,
@@ -159,25 +184,27 @@ __tc_create_img(__tc_type::__ostream             &__tc_img,
 extern "C"
 {
 auto
-__tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
-    -> decltype(__tc_type::__int())
+__tc_start(__tc_type::__int   __tc_argc,
+           __tc_type::__char *__tc_argv[]) -> decltype(__tc_type::__int())
 {
   __tc_type::__int __max_argc_val{5};
 
   static struct option __long_options[] = {
       {"color", no_argument, 0, 'c'},
+      {"raw",   no_argument, 0, 'r'},
       {"help",  no_argument, 0, 'h'},
       {0,       0,           0, 0  }
   };
   __tc_type::__int __option_index = 0;
 
-  __tc_type::__int __c =
-      getopt_long(__tc_argc, __tc_argv, "ch", __long_options, &__option_index);
+  __tc_type::__int __c = getopt_long_only(__tc_argc, __tc_argv, "crh",
+                                          __long_options, &__option_index);
 
   __tc_type::__char *__flag = (__tc_type::__char *) "";
 
   switch (__c) {
   case 'c': __flag = (__tc_type::__char *) "--color"; break;
+  case 'r': __flag = (__tc_type::__char *) "--raw"; break;
   case 'h':
     __flag = (__tc_type::__char *) "--help";
     __tc_helper::__tc_throw_and_exit(
@@ -203,8 +230,12 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
     break;
   }
 
-  if (strcmp(__flag, "--color") == 0)
+  if (strcmp(__flag, "--color") == 0 && strcmp(__flag, "--raw") == 0)
+    __max_argc_val = 10;
+  else if (strcmp(__flag, "--color") == 0)
     __max_argc_val = 9;
+  else if (strcmp(__flag, "--raw") == 0)
+    __max_argc_val = 6;
   else
     __max_argc_val = 5;
 
@@ -254,9 +285,9 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
           "and 255.\n");
     __color_g = std::stoi(__tc_argv[7]);
     if (__color_g > 255 || __color_g < 0)
-      __tc_helper::__tc_throw_and_exit(
-          "Invalid color green value specified! Please specify a value between "
-          "0 and 255.\n");
+      __tc_helper::__tc_throw_and_exit("Invalid color green value speci/fied! "
+                                       "Please specify a value between "
+                                       "0 and 255.\n");
     __color_b = std::stoi(__tc_argv[8]);
     if (__color_b > 255 || __color_b < 0)
       __tc_helper::__tc_throw_and_exit(
@@ -271,9 +302,14 @@ __tc_start(__tc_type::__int __tc_argc, __tc_type::__char *__tc_argv[])
   __tc_type::__ofstream    __img{};
   const __tc_type::__char *__fname = __fname_input.c_str();
   __img.open(__fname);
-  __tc_image::__tc_create_img(
-      __img, __fname, (__tc_effect::__tc_type_enum) __effect_type, __size_x,
-      __size_y, __color_r, __color_g, __color_b);
+  if (__max_argc_val == 10 | __max_argc_val == 6)
+    __tc_image::__tc_create_img(
+        std::cout, __fname, (__tc_effect::__tc_type_enum) __effect_type,
+        __size_x, __size_y, __color_r, __color_g, __color_b);
+  else
+    __tc_image::__tc_create_img(
+        __img, __fname, (__tc_effect::__tc_type_enum) __effect_type, __size_x,
+        __size_y, __color_r, __color_g, __color_b);
   __img.close();
 
   __tc_helper::__tc_throw_and_exit("Done!\n");
