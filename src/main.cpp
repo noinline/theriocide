@@ -191,6 +191,9 @@ public:
     if (__tc_image_stream.good())
       __tc_write_img(__tc_image_stream, __tc_effect_type, __tc_size_x,
                      __tc_size_y, __tc_color_r, __tc_color_g, __tc_color_b);
+    else
+      __tc_helper::__tc_throw_and_exit(
+          "Unexpected error has occured! Exitting...");
     __tc_print("Initialized ppm image: %s\n", __tc_fname);
   }
 };
